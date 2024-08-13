@@ -42,7 +42,6 @@ const APP_START_TIME = Date.now();
 const API_ROUTE_MAP = {
   "/users": users,
   "/results": results,
-  "/leaderboards": leaderboards,
   "/quotes": quotes,
   "/webhooks": webhooks,
   "/docs": docs,
@@ -56,6 +55,7 @@ const router = s.router(contract, {
   presets,
   psas,
   public: publicStats,
+  leaderboards,
 });
 
 export function addApiRoutes(app: Application): void {
@@ -123,7 +123,9 @@ function applyDevApiRoutes(app: Application): void {
     app.use(async (req, res, next) => {
       const slowdown = (await getLiveConfiguration()).dev.responseSlowdownMs;
       if (slowdown > 0) {
-        Logger.info(`Simulating ${slowdown}ms delay for ${req.path}`);
+        Logger.info(
+          `Simulating ${slowdown}ms delay for ${req.method} ${req.path}`
+        );
         await new Promise((resolve) => setTimeout(resolve, slowdown));
       }
       next();
