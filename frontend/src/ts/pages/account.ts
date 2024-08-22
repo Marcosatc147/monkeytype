@@ -3,7 +3,7 @@ import * as ResultFilters from "../elements/account/result-filters";
 import * as ThemeColors from "../elements/theme-colors";
 import * as ChartController from "../controllers/chart-controller";
 import Config, * as UpdateConfig from "../config";
-import * as MiniResultChart from "../elements/account/mini-result-chart";
+import * as MiniResultChartModal from "../modals/mini-result-chart";
 import * as PbTables from "../elements/account/pb-tables";
 import * as LoadingPage from "./loading";
 import * as Focus from "../test/focus";
@@ -1104,19 +1104,27 @@ function sortAndRefreshHistory(
 }
 
 $(".pageAccount button.toggleResultsOnChart").on("click", () => {
-  UpdateConfig.setAccountChartResults(!(Config.accountChart[0] === "on"));
+  const newValue = Config.accountChart;
+  newValue[0] = newValue[0] === "on" ? "off" : "on";
+  UpdateConfig.setAccountChart(newValue);
 });
 
 $(".pageAccount button.toggleAccuracyOnChart").on("click", () => {
-  UpdateConfig.setAccountChartAccuracy(!(Config.accountChart[1] === "on"));
+  const newValue = Config.accountChart;
+  newValue[1] = newValue[1] === "on" ? "off" : "on";
+  UpdateConfig.setAccountChart(newValue);
 });
 
 $(".pageAccount button.toggleAverage10OnChart").on("click", () => {
-  UpdateConfig.setAccountChartAvg10(!(Config.accountChart[2] === "on"));
+  const newValue = Config.accountChart;
+  newValue[2] = newValue[2] === "on" ? "off" : "on";
+  UpdateConfig.setAccountChart(newValue);
 });
 
 $(".pageAccount button.toggleAverage100OnChart").on("click", () => {
-  UpdateConfig.setAccountChartAvg100(!(Config.accountChart[3] === "on"));
+  const newValue = Config.accountChart;
+  newValue[3] = newValue[3] === "on" ? "off" : "on";
+  UpdateConfig.setAccountChart(newValue);
 });
 
 $(".pageAccount .loadMoreButton").on("click", () => {
@@ -1144,13 +1152,8 @@ $(".pageAccount").on("click", ".miniResultChartButton", (event) => {
   console.log("updating");
   const filteredId = $(event.currentTarget).attr("filteredResultsId");
   if (filteredId === undefined) return;
-  MiniResultChart.updateData(
+  MiniResultChartModal.show(
     filteredResults[parseInt(filteredId)]?.chartData as ChartData
-  );
-  MiniResultChart.show();
-  MiniResultChart.updatePosition(
-    event.pageX - ($(".pageAccount .miniResultChartWrapper").outerWidth() ?? 0),
-    event.pageY + 30
   );
 });
 
@@ -1289,10 +1292,10 @@ export const page = new Page({
 
     void update().then(() => {
       void updateChartColors();
-      $(".pageAccount .content p.accountVerificatinNotice").remove();
+      $(".pageAccount .content .accountVerificatinNotice").remove();
       if (Auth?.currentUser?.emailVerified === false) {
         $(".pageAccount .content").prepend(
-          `<p class="accountVerificatinNotice" style="text-align:center">Your account is not verified - <button class="sendVerificationEmail">send the verification email again</button>`
+          `<div class="accountVerificatinNotice"><i class="fas icon fa-exclamation-triangle"></i><p>Your email address is still not verified</p><button class="sendVerificationEmail">resend verification email</button></div>`
         );
       }
       ResultBatches.showOrHideIfNeeded();
